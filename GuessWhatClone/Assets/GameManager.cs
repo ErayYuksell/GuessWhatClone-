@@ -24,7 +24,6 @@ public class GameManager : MonoBehaviour
             Destroy(gameObject);
         }
     }
-
     public void TapPlayButton()
     {
         MainPanel.SetActive(false);
@@ -38,6 +37,7 @@ public class GameManager : MonoBehaviour
         OpenLoadingPanel();
         PhotonManager.Instance.ConnectToServer();
     }
+
 
     public void OpenQuizPanel()
     {
@@ -53,6 +53,12 @@ public class GameManager : MonoBehaviour
         CreateAndJoinPanel.SetActive(false);
     }
 
+    public void WaitingBackButton()
+    {
+        WaitingPanel.SetActive(false);
+        CreateAndJoinPanel.SetActive(true);
+    }
+
     public void OpenLoadingPanel()
     {
         LoadingPanel.SetActive(true);
@@ -64,10 +70,18 @@ public class GameManager : MonoBehaviour
         LoadingPanel.SetActive(false);
     }
 
+    public void LobbyBackButton()
+    {
+        CreateAndJoinPanel.SetActive(false);
+        MainPanel.SetActive(true);
+    }
+
     public void OpenTickPlayer2()
     {
         tick[1].gameObject.SetActive(true);
     }
+
+
 }
 
 
