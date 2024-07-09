@@ -4,41 +4,77 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 using DG.Tweening;
+using Photon.Pun;
+using Photon.Realtime;
 
-public class QuestionsManager : MonoBehaviour
+public class QuestionsManager : MonoBehaviourPunCallbacks
 {
-    // Soru ve seçenekler ile ilgili alanlar
-    [Header(" Question and options")]
+    public static QuestionsManager Instance;
+
+    [Header("Question and options")]
     [SerializeField] TextMeshProUGUI Question;
     [SerializeField] Button[] options;
     [SerializeField] List<Question> questions = new List<Question>();
     List<Question> remainingQuestions;
 
-    // Geçerli soru ve seçilen cevap
     [Header("Valid question and selected answer")]
     Question currentQuestion;
     int selectedAnswerIndex = -1;
 
-    // Renkler ile ilgili alanlar
     [Header("Colors")]
     [SerializeField] Color correctColor = Color.green;
     [SerializeField] Color wrongColor = Color.red;
     [SerializeField] Color defaultColor = Color.white;
 
-    // Sayaç ve puan ile ilgili alanlar
     [Header("Counter and Points")]
     [SerializeField] TextMeshProUGUI scoreText;
     [SerializeField] TextMeshProUGUI timerText;
     int score = 0;
     float timeRemaining = 10f;
     bool isQuestionActive = false;
+    bool isMultiplayer = false;
 
+    private PhotonView photonView;
+    private bool[] playersAnswered = new bool[2];
+    private int correctAnswerIndex;
+    private int[] playerSelections = new int[2];
+
+    void Awake()
+    {
+        if (Instance == null)
+        {
+            Instance = this;
+            DontDestroyOnLoad(gameObject);
+            photonView = GetComponent<PhotonView>();
+        }
+        else
+        {
+            Destroy(gameObject);
+        }
+    }
 
     void Start()
     {
-        remainingQuestions = new List<Question>(questions);
-        UpdateScoreText();
-        ShowQuestion();
+        if (questions != null && questions.Count > 0)
+        {
+            remainingQuestions = new List<Question>(questions);
+            UpdateScoreText();
+            if (remainingQuestions.Count > 0)
+            {
+                if (!isMultiplayer)
+                {
+                    ShowQuestion();
+                }
+            }
+            else
+            {
+                Debug.LogError("No questions available in the list.");
+            }
+        }
+        else
+        {
+            Debug.LogError("Questions list is null or empty.");
+        }
     }
 
     void Update()
@@ -55,7 +91,6 @@ public class QuestionsManager : MonoBehaviour
 
             if (timeRemaining <= 0)
             {
-                // Zaman dolduðunda, yanlýþ cevap verilmiþ gibi iþlem yap
                 isQuestionActive = false;
                 CheckAnswerTimedOut();
             }
@@ -68,48 +103,86 @@ public class QuestionsManager : MonoBehaviour
         timeRemaining = 10f;
         isQuestionActive = true;
 
-        if (remainingQuestions.Count == 0)
-        {
-            Debug.Log("Tüm sorular cevaplandý.");
-            return;
-        }
-
         int randomIndex = Random.Range(0, remainingQuestions.Count);
         currentQuestion = remainingQuestions[randomIndex];
         remainingQuestions.RemoveAt(randomIndex);
 
-        Question.text = currentQuestion.questionText;
+        correctAnswerIndex = currentQuestion.correctAnswerIndex;
+
+        if (currentQuestion == null)
+        {
+            Debug.LogError("Current question is null.");
+            return;
+        }
+
+        photonView.RPC("RPC_UpdateQuestionUI", RpcTarget.All, currentQuestion.questionText, currentQuestion.answers, correctAnswerIndex);
+    }
+
+    [PunRPC]
+    void RPC_UpdateQuestionUI(string questionText, string[] answers, int correctIndex)
+    {
+        UpdateQuestionUI(questionText, answers, correctIndex);
+    }
+
+    void UpdateQuestionUI(string questionText, string[] answers, int correctIndex)
+    {
+        Question.text = questionText;
+        correctAnswerIndex = correctIndex;
 
         for (int i = 0; i < options.Length; i++)
         {
-            options[i].GetComponentInChildren<TextMeshProUGUI>().text = currentQuestion.answers[i];
-            int index = i; // Closure sorunu nedeniyle index'in yerel bir kopyasýný alýn
+            options[i].GetComponentInChildren<TextMeshProUGUI>().text = answers[i];
+            int index = i;
             options[i].onClick.RemoveAllListeners();
             options[i].onClick.AddListener(() => OnAnswerSelected(index));
+            // Gizle player iconlarýný baþlangýçta
+            options[i].transform.Find("Player1Icon").gameObject.SetActive(false);
+            options[i].transform.Find("Player2Icon").gameObject.SetActive(false);
+            options[i].interactable = true;
         }
+
+        playersAnswered[0] = false;
+        playersAnswered[1] = false;
     }
 
     public void OnAnswerSelected(int index)
     {
         selectedAnswerIndex = index;
         isQuestionActive = false;
-        CheckAnswer();
+        SetOptionsInteractable(false);  // Seçim yapýldýktan sonra butonlarý devre dýþý býrak
+        photonView.RPC("RPC_PlayerAnswered", RpcTarget.All, PhotonNetwork.LocalPlayer.ActorNumber, index);
     }
 
-    public void CheckAnswer()
+    [PunRPC]
+    void RPC_PlayerAnswered(int playerID, int index)
     {
-        if (selectedAnswerIndex == currentQuestion.correctAnswerIndex)
+        playersAnswered[playerID - 1] = true;
+        playerSelections[playerID - 1] = index;
+
+        string playerIconName = (playerID == 1) ? "Player1Icon" : "Player2Icon";
+        options[index].transform.Find(playerIconName).gameObject.SetActive(true);
+
+        if (playersAnswered[0] && playersAnswered[1])
         {
-            Debug.Log("Correct Answer");
-            score += 10;
-            UpdateScoreText();
-            options[selectedAnswerIndex].GetComponent<Image>().DOColor(correctColor, 0.5f).SetEase(Ease.InOutSine);
+            CheckAnswers();
         }
-        else
+    }
+
+    void CheckAnswers()
+    {
+        // Correct Answer Color for both players
+        options[correctAnswerIndex].GetComponent<Image>().DOColor(correctColor, 0.5f).SetEase(Ease.InOutSine);
+
+        // Player 1's Answer
+        if (playerSelections[0] != correctAnswerIndex)
         {
-            Debug.Log("Wrong Answer");
-            options[selectedAnswerIndex].GetComponent<Image>().DOColor(wrongColor, 0.5f).SetEase(Ease.InOutSine);
-            options[currentQuestion.correctAnswerIndex].GetComponent<Image>().DOColor(correctColor, 0.5f).SetEase(Ease.InOutSine);
+            options[playerSelections[0]].GetComponent<Image>().DOColor(wrongColor, 0.5f).SetEase(Ease.InOutSine);
+        }
+
+        // Player 2's Answer
+        if (playerSelections[1] != correctAnswerIndex)
+        {
+            options[playerSelections[1]].GetComponent<Image>().DOColor(wrongColor, 0.5f).SetEase(Ease.InOutSine);
         }
 
         StartCoroutine(WaitAndShowNextQuestion(2));
@@ -118,27 +191,69 @@ public class QuestionsManager : MonoBehaviour
     public void CheckAnswerTimedOut()
     {
         Debug.Log("Time's up! Wrong Answer");
-        options[currentQuestion.correctAnswerIndex].GetComponent<Image>().DOColor(correctColor, 0.5f).SetEase(Ease.InOutSine);
+        options[correctAnswerIndex].GetComponent<Image>().DOColor(correctColor, 0.5f).SetEase(Ease.InOutSine);
 
         StartCoroutine(WaitAndShowNextQuestion(2));
     }
 
     public void UpdateScoreText()
     {
-        scoreText.text ="Score: " + score.ToString();
+        if (scoreText != null)
+        {
+            scoreText.text = "Score: " + score.ToString();
+        }
+        else
+        {
+            Debug.LogError("Score TextMeshProUGUI is not assigned.");
+        }
     }
 
     private void ResetOptionColors()
     {
         foreach (var option in options)
         {
-            option.GetComponent<Image>().color = defaultColor;
+            if (option != null)
+            {
+                option.GetComponent<Image>().color = defaultColor;
+                // Iconlarý da gizle
+                option.transform.Find("Player1Icon").gameObject.SetActive(false);
+                option.transform.Find("Player2Icon").gameObject.SetActive(false);
+            }
+        }
+    }
+
+    private void SetOptionsInteractable(bool interactable)
+    {
+        foreach (var option in options)
+        {
+            option.interactable = interactable;
         }
     }
 
     private IEnumerator WaitAndShowNextQuestion(float waitTime)
     {
         yield return new WaitForSeconds(waitTime);
-        ShowQuestion();
+        if (remainingQuestions.Count > 0)
+        {
+            ShowQuestion();
+        }
+    }
+
+    public void SetMultiplayer(bool isMultiplayer)
+    {
+        this.isMultiplayer = isMultiplayer;
+        if (isMultiplayer)
+        {
+            photonView.RPC("RPC_RequestStartQuiz", RpcTarget.MasterClient);
+        }
+    }
+
+    [PunRPC]
+    void RPC_RequestStartQuiz()
+    {
+        if (PhotonNetwork.IsMasterClient)
+        {
+            ShowQuestion();
+        }
     }
 }
