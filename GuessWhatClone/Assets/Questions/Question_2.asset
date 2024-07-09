@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 849a7e26e4532aa4c977db2a9fc7d6b7, type: 3}
   m_Name: Question_2
   m_EditorClassIdentifier: 
-  questionText: Ahmetin penis boyu nedir?
+  questionText: Ahmeti kac yasindadir
   answers:
   - 3
   - 4

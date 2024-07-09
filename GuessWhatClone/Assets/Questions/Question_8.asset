@@ -10,9 +10,9 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 849a7e26e4532aa4c977db2a9fc7d6b7, type: 3}
-  m_Name: Question_5
+  m_Name: Question_8
   m_EditorClassIdentifier: 
-  questionText: 'RIck Grimes kac kisi oldurdu '
+  questionText: La havla
   answers:
   - 1
   - 2

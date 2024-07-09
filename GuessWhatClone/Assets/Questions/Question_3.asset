@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 849a7e26e4532aa4c977db2a9fc7d6b7, type: 3}
   m_Name: Question_3
   m_EditorClassIdentifier: 
-  questionText: Ali abim kac kile gobekle yasiyor
+  questionText: Ali kac yasindadir
   answers:
   - 31
   - 25

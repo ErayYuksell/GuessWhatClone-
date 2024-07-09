@@ -149,7 +149,7 @@ public class QuestionsManager : MonoBehaviourPunCallbacks
     {
         selectedAnswerIndex = index;
         isQuestionActive = false;
-        SetOptionsInteractable(false);  // Seçim yapýldýktan sonra butonlarý devre dýþý býrak
+        SetOptionsInteractable(false);  // Secenek secince butonlari kapa 
         photonView.RPC("RPC_PlayerAnswered", RpcTarget.All, PhotonNetwork.LocalPlayer.ActorNumber, index);
     }
 
@@ -215,7 +215,7 @@ public class QuestionsManager : MonoBehaviourPunCallbacks
             if (option != null)
             {
                 option.GetComponent<Image>().color = defaultColor;
-                // Iconlarý da gizle
+               
                 option.transform.Find("Player1Icon").gameObject.SetActive(false);
                 option.transform.Find("Player2Icon").gameObject.SetActive(false);
             }
