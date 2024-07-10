@@ -10,8 +10,8 @@ public class GameManager : MonoBehaviour
     [SerializeField] GameObject CreateAndJoinPanel;
     [SerializeField] GameObject LoadingPanel;
     [SerializeField] GameObject WaitingPanel;
-    public bool isConnected = false;
     [SerializeField] Image[] tick = new Image[2];
+
     private void Awake()
     {
         if (Instance == null)
@@ -24,26 +24,28 @@ public class GameManager : MonoBehaviour
             Destroy(gameObject);
         }
     }
+
     public void TapPlayButton()
     {
         MainPanel.SetActive(false);
         QuizPanel.SetActive(true);
+        QuestionsManager.Instance.SetMultiplayer(false);  // Tek kiþilik mod için QuestionsManager'da multiplayer'ý false yap
+        QuestionsManager.Instance.ShowQuestion();  // Sorularý baþlat
     }
 
     public void TapMultiPlayButton()
     {
         MainPanel.SetActive(false);
-        isConnected = true;
         OpenLoadingPanel();
         PhotonManager.Instance.ConnectToServer();
     }
-
 
     public void OpenQuizPanel()
     {
         QuizPanel.SetActive(true);
         CreateAndJoinPanel.SetActive(false);
         WaitingPanel.SetActive(false);
+        QuestionsManager.Instance.SetMultiplayer(true);  // Çok oyunculu mod için multiplayer'ý true yap
     }
 
     public void OpenWaitingPanel()
@@ -80,8 +82,4 @@ public class GameManager : MonoBehaviour
     {
         tick[1].gameObject.SetActive(true);
     }
-
-
 }
-
-

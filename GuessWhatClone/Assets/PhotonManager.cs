@@ -33,14 +33,20 @@ public class PhotonManager : MonoBehaviourPunCallbacks // bazi callback fonksyio
         PhotonNetwork.JoinLobby();
     }
 
+    //public override void OnJoinedLobby()
+    //{
+    //    if (GameManager.Instance.isConnected)
+    //    {
+    //        Debug.Log("Joined Lobby");
+    //        GameManager.Instance.OpenCreateJoinPanel();
+    //    }
+    //}
     public override void OnJoinedLobby()
     {
-        if (GameManager.Instance.isConnected)
-        {
-            Debug.Log("Joined Lobby");
-            GameManager.Instance.OpenCreateJoinPanel();
-        }
+        Debug.Log("Joined Lobby");
+        GameManager.Instance.OpenCreateJoinPanel();
     }
+
 
     //public void CreateRoom()
     //{

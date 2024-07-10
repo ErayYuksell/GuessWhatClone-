@@ -1324,7 +1324,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &332517720
 RectTransform:
   m_ObjectHideFlags: 0
@@ -4314,7 +4314,6 @@ MonoBehaviour:
   CreateAndJoinPanel: {fileID: 254805657}
   LoadingPanel: {fileID: 69189305}
   WaitingPanel: {fileID: 1047195633}
-  isConnected: 0
   tick:
   - {fileID: 290111575}
   - {fileID: 905447718}
@@ -6479,6 +6478,11 @@ MonoBehaviour:
   - {fileID: 11400000, guid: c74a62812783a12438bf6ca3bf90c7d4, type: 2}
   - {fileID: 11400000, guid: bfab091d01762c1438c2206f0e567749, type: 2}
   - {fileID: 11400000, guid: 403d37010bff2944d9e3f75085c256b1, type: 2}
+  - {fileID: 11400000, guid: 2606008e155413e4298dd1e820773052, type: 2}
+  - {fileID: 11400000, guid: 250ca0db8b6e64343b87998a1936244a, type: 2}
+  - {fileID: 11400000, guid: bb5bb03dca0c8b54b892dfc8ec2c3b8c, type: 2}
+  - {fileID: 11400000, guid: 756684d1ba6c85b41bf9365527f19a4d, type: 2}
+  - {fileID: 11400000, guid: 1399a22035d931b459db4a5ad71cc80b, type: 2}
   correctColor: {r: 0, g: 1, b: 0, a: 1}
   wrongColor: {r: 1, g: 0, b: 0, a: 1}
   defaultColor: {r: 1, g: 1, b: 1, a: 1}
