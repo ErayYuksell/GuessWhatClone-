@@ -1460,7 +1460,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 86.99997, y: -194}
+  m_AnchoredPosition: {x: 50, y: -194}
   m_SizeDelta: {x: 75, y: 75}
   m_Pivot: {x: 0, y: 1}
 --- !u!114 &379467005
@@ -1483,7 +1483,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 21300000, guid: 5c3e61c5d878da443a849eae6f7361a9, type: 3}
+  m_Sprite: {fileID: 21300000, guid: ef166afe56258a149a369e0b31ae508d, type: 3}
   m_Type: 0
   m_PreserveAspect: 0
   m_FillCenter: 1
@@ -5499,7 +5499,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 87, y: -194}
+  m_AnchoredPosition: {x: 50, y: -194}
   m_SizeDelta: {x: 75, y: 75}
   m_Pivot: {x: 0, y: 1}
 --- !u!114 &1685661858
@@ -6086,7 +6086,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!224 &1844483537
 RectTransform:
   m_ObjectHideFlags: 0
@@ -6702,7 +6702,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &2113823239
 RectTransform:
   m_ObjectHideFlags: 0
@@ -6798,6 +6798,9 @@ MonoBehaviour:
   defaultColor: {r: 1, g: 1, b: 1, a: 1}
   scoreText: {fileID: 593765741}
   timerText: {fileID: 290288086}
+  lineTransform: {fileID: 1914179283}
+  player1_Image: {fileID: 1685661857}
+  player2_Image: {fileID: 379467004}
 --- !u!114 &2113823243
 MonoBehaviour:
   m_ObjectHideFlags: 0

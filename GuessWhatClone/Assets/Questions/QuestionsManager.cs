@@ -39,6 +39,13 @@ public class QuestionsManager : MonoBehaviourPunCallbacks
     private int correctAnswerIndex;
     private int[] playerSelections = new int[2];
 
+    int player1_score = 0;
+    int player2_score = 0;
+
+    [SerializeField] RectTransform lineTransform;
+    [SerializeField] RectTransform player1_Image;
+    [SerializeField] RectTransform player2_Image;
+
     void Awake()
     {
         if (Instance == null)
@@ -99,44 +106,46 @@ public class QuestionsManager : MonoBehaviourPunCallbacks
 
     public void ShowQuestion()
     {
-        ResetOptionColors();
-        timeRemaining = 10f;
-        isQuestionActive = true;
-
-        if (remainingQuestions == null || remainingQuestions.Count == 0) // null hatalarindan dolayi koydum 
+        if (remainingQuestions == null || remainingQuestions.Count == 0)
         {
             Debug.LogError("No remaining questions.");
             return;
         }
 
-        int randomIndex = Random.Range(0, remainingQuestions.Count);
-        currentQuestion = remainingQuestions[randomIndex];
-        remainingQuestions.RemoveAt(randomIndex);
-
-        if (currentQuestion == null) // null hatalarindan dolayi koydum 
+        if (isMultiplayer) // bazen sorular 2 cihazda farkli oluyordu bunu engellemek icin masterClient soruyu seciyor daha sonra tum cihazlara gosretiyor 
         {
-            Debug.LogError("Current question is null.");
-            return;
-        }
+            if (PhotonNetwork.IsMasterClient)
+            {
+                int randomIndex = Random.Range(0, remainingQuestions.Count);
+                currentQuestion = remainingQuestions[randomIndex];
+                remainingQuestions.RemoveAt(randomIndex);
 
-        correctAnswerIndex = currentQuestion.correctAnswerIndex;
+                if (currentQuestion == null)
+                {
+                    Debug.LogError("Current question is null.");
+                    return;
+                }
 
-        if (options == null || options.Length == 0) // null hatalarindan dolayi koydum 
-        {
-            Debug.LogError("Options are not assigned.");
-            return;
-        }
-
-        if (isMultiplayer)
-        {
-            photonView.RPC("RPC_UpdateQuestionUI", RpcTarget.All, currentQuestion.questionText, currentQuestion.answers, correctAnswerIndex);
+                correctAnswerIndex = currentQuestion.correctAnswerIndex;
+                photonView.RPC("RPC_UpdateQuestionUI", RpcTarget.All, currentQuestion.questionText, currentQuestion.answers, correctAnswerIndex);
+            }
         }
         else
         {
+            int randomIndex = Random.Range(0, remainingQuestions.Count);
+            currentQuestion = remainingQuestions[randomIndex];
+            remainingQuestions.RemoveAt(randomIndex);
+
+            if (currentQuestion == null)
+            {
+                Debug.LogError("Current question is null.");
+                return;
+            }
+
+            correctAnswerIndex = currentQuestion.correctAnswerIndex;
             UpdateQuestionUI(currentQuestion.questionText, currentQuestion.answers, correctAnswerIndex);
         }
     }
-
 
     [PunRPC]
     void RPC_UpdateQuestionUI(string questionText, string[] answers, int correctIndex)
@@ -146,6 +155,10 @@ public class QuestionsManager : MonoBehaviourPunCallbacks
 
     void UpdateQuestionUI(string questionText, string[] answers, int correctIndex)
     {
+        ResetOptionColors();
+        timeRemaining = 10f;
+        isQuestionActive = true;
+
         Question.text = questionText;
         correctAnswerIndex = correctIndex;
 
@@ -155,7 +168,6 @@ public class QuestionsManager : MonoBehaviourPunCallbacks
             int index = i;
             options[i].onClick.RemoveAllListeners();
             options[i].onClick.AddListener(() => OnAnswerSelected(index));
-            // Gizle player iconlarýný baþlangýçta
             options[i].transform.Find("Player1Icon").gameObject.SetActive(false);
             options[i].transform.Find("Player2Icon").gameObject.SetActive(false);
             options[i].interactable = true;
@@ -164,6 +176,7 @@ public class QuestionsManager : MonoBehaviourPunCallbacks
         playersAnswered[0] = false;
         playersAnswered[1] = false;
     }
+
 
     public void OnAnswerSelected(int index)
     {
@@ -225,6 +238,7 @@ public class QuestionsManager : MonoBehaviourPunCallbacks
                 {
                     score += 10;
                     UpdateScoreText();
+                    MovePlayersImage(1);
                 }
                 else
                 {
@@ -239,6 +253,7 @@ public class QuestionsManager : MonoBehaviourPunCallbacks
                 {
                     score += 10;
                     UpdateScoreText();
+                    MovePlayersImage(2);
                 }
                 else
                 {
@@ -249,7 +264,40 @@ public class QuestionsManager : MonoBehaviourPunCallbacks
 
         StartCoroutine(WaitAndShowNextQuestion(2));
     }
+    public void MovePlayersImage(int playerID)
+    {
+        if (playerID == 1)
+        {
+            photonView.RPC("RPC_MoveTheImage", RpcTarget.All, playerID, new Vector2(50, 0)); // RPC fonksiyonu paremetresi olarak direkt olarak rectTransform veremedim hata verdi sanirim direkt olarak image cart curt da veremem 
+        }
+        else if (playerID == 2)
+        {
+            photonView.RPC("RPC_MoveTheImage", RpcTarget.All, playerID, new Vector2(50, 0));
+        }
+    }
 
+    [PunRPC]
+    public void RPC_MoveTheImage(int playerID, Vector2 offset) // iki tarafada gostermek istedigim seyler RPC fonksiyonlari ile yapiyorum 
+    {
+        RectTransform playerImage = null;
+
+        if (playerID == 1)
+        {
+            playerImage = player1_Image;
+        }
+        else if (playerID == 2)
+        {
+            playerImage = player2_Image;
+        }
+
+        if (playerImage != null)
+        {
+            Vector2 currentPosition = playerImage.anchoredPosition;
+            Vector2 targetPosition = currentPosition + offset;
+
+            playerImage.DOAnchorPos(targetPosition, 1f);
+        }
+    }
 
     public void CheckAnswerTimedOut()
     {
@@ -319,4 +367,8 @@ public class QuestionsManager : MonoBehaviourPunCallbacks
             ShowQuestion();
         }
     }
+
+
+  
+
 }

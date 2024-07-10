@@ -44,6 +44,9 @@ MonoBehaviour:
   - RPC_OpenQuizPanel
   - RPC_PlayerAnswered
   - RPC_RequestStartQuiz
+  - RPC_MoveThePictures
+  - RPC_MoveThePicture
+  - RPC_MoveTheImage
   DisableAutoOpenWizard: 1
   ShowSettings: 0
   DevRegionSetOnce: 1
