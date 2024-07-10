@@ -70,6 +70,7 @@ public class QuestionsManager : MonoBehaviourPunCallbacks
             {
                 if (!isMultiplayer)
                 {
+                    player2_Image.gameObject.SetActive(false);
                     ShowQuestion();
                 }
             }
@@ -182,10 +183,11 @@ public class QuestionsManager : MonoBehaviourPunCallbacks
     {
         selectedAnswerIndex = index;
         isQuestionActive = false;
-        SetOptionsInteractable(false);  // Secenek secince butonlari kapa 
+        SetOptionsInteractable(false);  // Seçenek seçilince butonlarý kapat 
 
         if (isMultiplayer)
         {
+            ShowSelectedAnswer(PhotonNetwork.LocalPlayer.ActorNumber, index);  // Kendi seçimini göster
             photonView.RPC("RPC_PlayerAnswered", RpcTarget.All, PhotonNetwork.LocalPlayer.ActorNumber, index);
         }
         else
@@ -196,20 +198,39 @@ public class QuestionsManager : MonoBehaviourPunCallbacks
         }
     }
 
+
     [PunRPC]
     void RPC_PlayerAnswered(int playerID, int index)
     {
         playersAnswered[playerID - 1] = true;
         playerSelections[playerID - 1] = index;
 
-        string playerIconName = (playerID == 1) ? "Player1Icon" : "Player2Icon";
-        options[index].transform.Find(playerIconName).gameObject.SetActive(true);
-
         if (playersAnswered[0] && playersAnswered[1])
         {
+            ShowAllSelectedAnswers();
             CheckAnswers();
         }
     }
+
+    void ShowSelectedAnswer(int playerID, int index) // oyuncu kendi cihazinda yaptigi secimi direkt olarak gorecek 
+    {
+        string playerIconName = (playerID == 1) ? "Player1Icon" : "Player2Icon"; // player id ye gore image secimi yapiyor daha sonra tiklanan secenekteki image i aciyor 
+        options[index].transform.Find(playerIconName).gameObject.SetActive(true);
+    }
+
+    void ShowAllSelectedAnswers()  // oyuncularin birbirinden kopya cekmemesi icin iki oyuncuda secenekleri sectikten sonra secilen secenekler gozukecek 
+    {
+        for (int i = 0; i < playerSelections.Length; i++)
+        {
+            int selectedIndex = playerSelections[i];
+            if (selectedIndex >= 0 && selectedIndex < options.Length)
+            {
+                string playerIconName = (i == 0) ? "Player1Icon" : "Player2Icon";
+                options[selectedIndex].transform.Find(playerIconName).gameObject.SetActive(true);
+            }
+        }
+    }
+
 
     void CheckAnswers()
     {
@@ -223,6 +244,7 @@ public class QuestionsManager : MonoBehaviourPunCallbacks
             {
                 score += 10;
                 UpdateScoreText();
+                MovePlayersImage(1);
             }
             else
             {
@@ -266,18 +288,28 @@ public class QuestionsManager : MonoBehaviourPunCallbacks
     }
     public void MovePlayersImage(int playerID)
     {
-        if (playerID == 1)
+        if (isMultiplayer)
         {
-            photonView.RPC("RPC_MoveTheImage", RpcTarget.All, playerID, new Vector2(50, 0)); // RPC fonksiyonu paremetresi olarak direkt olarak rectTransform veremedim hata verdi sanirim direkt olarak image cart curt da veremem 
+            if (playerID == 1)
+            {
+                photonView.RPC("RPC_MoveTheImage", RpcTarget.All, playerID, new Vector2(50, 0)); // RPC fonksiyonu paremetresi olarak direkt olarak rectTransform veremedim hata verdi sanirim direkt olarak image cart curt da veremem 
+            }
+            else if (playerID == 2)
+            {
+                photonView.RPC("RPC_MoveTheImage", RpcTarget.All, playerID, new Vector2(50, 0));
+            }
         }
-        else if (playerID == 2)
+        else
         {
-            photonView.RPC("RPC_MoveTheImage", RpcTarget.All, playerID, new Vector2(50, 0));
+            Vector2 currentPosition = player1_Image.anchoredPosition;
+            Vector2 targetPosition = currentPosition + new Vector2(50, 0);
+
+            player1_Image.DOAnchorPos(targetPosition, 1f);
         }
     }
 
     [PunRPC]
-    public void RPC_MoveTheImage(int playerID, Vector2 offset) // iki tarafada gostermek istedigim seyler RPC fonksiyonlari ile yapiyorum 
+    public void RPC_MoveTheImage(int playerID, Vector2 offset)
     {
         RectTransform playerImage = null;
 
@@ -369,6 +401,6 @@ public class QuestionsManager : MonoBehaviourPunCallbacks
     }
 
 
-  
+
 
 }
