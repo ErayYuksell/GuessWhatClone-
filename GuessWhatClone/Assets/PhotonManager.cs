@@ -3,7 +3,7 @@ using Photon.Pun;
 using Photon.Realtime;
 using TMPro;
 
-public class PhotonManager : MonoBehaviourPunCallbacks // bazi callback fonksyionlarini kullanabilmek icin buna cevirdik 
+public class PhotonManager : MonoBehaviourPunCallbacks
 {
     public static PhotonManager Instance;
     public TMP_InputField createInput;
@@ -24,10 +24,10 @@ public class PhotonManager : MonoBehaviourPunCallbacks // bazi callback fonksyio
 
     public void ConnectToServer()
     {
-        PhotonNetwork.ConnectUsingSettings(); // Photon sucunusuna baglanmami saglar 
+        PhotonNetwork.ConnectUsingSettings(); // Photon sunucusuna baðlanmamý saðlar 
     }
 
-    public override void OnConnectedToMaster() // bellir bir olay gerceklestiginde photon tarafindan otamatik olarak cagrilan bir fonksiyon sunucuya basarili bir sekilde baglandiginda icerisinde kodlari calistirir 
+    public override void OnConnectedToMaster()
     {
         Debug.Log("Connected to Master");
         PhotonNetwork.JoinLobby();
@@ -36,37 +36,37 @@ public class PhotonManager : MonoBehaviourPunCallbacks // bazi callback fonksyio
     public override void OnJoinedLobby()
     {
         Debug.Log("Joined Lobby");
-        GameManager.Instance.OpenCreateJoinPanel();
+        GameManager.Instance.OpenMultiplayerChoiseModePanel();
     }
 
-
-    //public void CreateRoom()
-    //{
-    //    PhotonNetwork.CreateRoom(null, new RoomOptions { MaxPlayers = 2 });
-    //}
-
-    //public void JoinRandomRoom() // bu sekilde var olan random bir odaya da girebilirim 
-    //{
-    //    PhotonNetwork.JoinRandomRoom();
-    //}
-
-    // ust taraftaki oda olusturma ve odaya girme daha genel dusun rastgele odalara girebilir ya da olusturabilirsin 
     public void CreateRoom()
     {
-        PhotonNetwork.CreateRoom(createInput.text);
+        PhotonNetwork.CreateRoom(createInput.text); // Private Room kurar
     }
+
     public void JoinLobby()
     {
-        PhotonNetwork.JoinRoom(joinInput.text);
+        PhotonNetwork.JoinRoom(joinInput.text); // Private Rooma katýlýr 
     }
-    public override void OnJoinedRoom() // odaya katildigimizda otamatik olarak cagrilir 
+
+    public void JoinRandomRoom() // Rastgele bir odaya katýlmayý saðlar
+    {
+        PhotonNetwork.JoinRandomRoom();
+    }
+
+    public override void OnJoinRandomFailed(short returnCode, string message)
+    {
+        Debug.Log("Join Random Room Failed");
+        PhotonNetwork.CreateRoom(null, new RoomOptions { MaxPlayers = 2 });
+    }
+
+    public override void OnJoinedRoom()
     {
         Debug.Log("Joined Room");
-        //PhotonNetwork.LoadLevel("GameScene"); // cok oyunculu bir sahne yuklemek istedigimde bunu kullanmam lazim 
         GameManager.Instance.OpenWaitingPanel();
     }
 
-    public override void OnPlayerEnteredRoom(Player newPlayer) // yeni bir oyuncu odaya girdiginde otamatik calisir 
+    public override void OnPlayerEnteredRoom(Player newPlayer)
     {
         Debug.Log("New Player Joined Room");
         GameManager.Instance.OpenTickPlayer2();
@@ -77,23 +77,13 @@ public class PhotonManager : MonoBehaviourPunCallbacks // bazi callback fonksyio
     {
         if (PhotonNetwork.CurrentRoom.PlayerCount == 2)
         {
-            photonView.RPC("RPC_OpenQuizPanel", RpcTarget.All);
+            photonView.RPC("RPC_StartCountdown", RpcTarget.All);
         }
     }
 
     [PunRPC]
-    private void RPC_OpenQuizPanel()
+    private void RPC_StartCountdown()
     {
-        GameManager.Instance.OpenQuizPanel();
+        GameManager.Instance.StartCountdown();
     }
-
-    //public override void OnJoinRandomFailed(short returnCode, string message)
-    //{
-    //    Debug.Log("Join Random Room Failed");
-    //    CreateRoom();
-    //}
-
 }
-
-
-

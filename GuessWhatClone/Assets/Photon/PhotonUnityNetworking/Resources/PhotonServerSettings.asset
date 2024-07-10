@@ -47,6 +47,8 @@ MonoBehaviour:
   - RPC_MoveThePictures
   - RPC_MoveThePicture
   - RPC_MoveTheImage
+  - RPC_StartCountdown
+  - StartCountdown
   DisableAutoOpenWizard: 1
   ShowSettings: 0
   DevRegionSetOnce: 1

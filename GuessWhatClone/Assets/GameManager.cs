@@ -1,7 +1,10 @@
 using UnityEngine;
 using UnityEngine.UI;
+using Photon.Pun;
+using System.Collections;
+using TMPro;
 
-public class GameManager : MonoBehaviour
+public class GameManager : MonoBehaviourPunCallbacks
 {
     public static GameManager Instance;
 
@@ -11,6 +14,7 @@ public class GameManager : MonoBehaviour
     [SerializeField] GameObject LoadingPanel;
     [SerializeField] GameObject WaitingPanel;
     [SerializeField] GameObject MultiplayerModeChoisePanel;
+    [SerializeField] TextMeshProUGUI CountdownText;
     [SerializeField] Image[] tick = new Image[2];
 
     private void Awake()
@@ -34,13 +38,17 @@ public class GameManager : MonoBehaviour
         QuestionsManager.Instance.ShowQuestion();  // Sorularý baþlat
     }
 
-    public void TapMultiPlayButton() // calisma mantigi olarak multiplayer butonuna tikladigimda loading panel acilir ve servere baglanmaya calisir photon managerdaki 
-                                     // OnConnectMaster baglaninca otamatik calisir bu calisinca lobiye katiliriz lobby katilinca otamatik OnJoinedLobby calisir ve CreateAndJoinPanel acilir 
+    public void TapMultiPlayButton()
     {
         MainPanel.SetActive(false);
+        LoadingPanel.SetActive(true);
+        PhotonManager.Instance.ConnectToServer();
+    }
+
+    public void OpenMultiplayerChoiseModePanel()
+    {
+        LoadingPanel.SetActive(false);
         MultiplayerModeChoisePanel.SetActive(true);
-        //LoadingPanel.SetActive(true);
-        //PhotonManager.Instance.ConnectToServer();
     }
 
     public void OpenQuizPanel()
@@ -56,6 +64,7 @@ public class GameManager : MonoBehaviour
         WaitingPanel.SetActive(true);
         tick[0].gameObject.SetActive(true);
         CreateAndJoinPanel.SetActive(false);
+        LoadingPanel.SetActive(false);
     }
 
     public void WaitingBackButton()
@@ -68,6 +77,7 @@ public class GameManager : MonoBehaviour
     {
         CreateAndJoinPanel.SetActive(true);
         LoadingPanel.SetActive(false);
+        WaitingPanel.SetActive(false);
     }
 
     public void LobbyBackButton()
@@ -86,12 +96,32 @@ public class GameManager : MonoBehaviour
     public void PlayPrivateRoom()
     {
         MultiplayerModeChoisePanel.SetActive(false);
-        LoadingPanel.SetActive(true);
-        PhotonManager.Instance.ConnectToServer();
+        CreateAndJoinPanel.SetActive(true);
     }
 
     public void PlayAnotherPlayer()
     {
-       
+        MultiplayerModeChoisePanel.SetActive(false);
+        LoadingPanel.SetActive(true);
+        PhotonManager.Instance.JoinRandomRoom();
+    }
+
+    [PunRPC]
+    public void StartCountdown()
+    {
+        StartCoroutine(CountdownCoroutine());
+    }
+
+    private IEnumerator CountdownCoroutine()
+    {
+        CountdownText.gameObject.SetActive(true);
+        int countdown = 5;
+        while (countdown > 0)
+        {
+            CountdownText.text = countdown.ToString();
+            yield return new WaitForSeconds(1);
+            countdown--;
+        }
+        OpenQuizPanel();
     }
 }
