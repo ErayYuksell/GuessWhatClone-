@@ -10,6 +10,7 @@ public class GameManager : MonoBehaviour
     [SerializeField] GameObject CreateAndJoinPanel;
     [SerializeField] GameObject LoadingPanel;
     [SerializeField] GameObject WaitingPanel;
+    [SerializeField] GameObject MultiplayerModeChoisePanel;
     [SerializeField] Image[] tick = new Image[2];
 
     private void Awake()
@@ -33,11 +34,13 @@ public class GameManager : MonoBehaviour
         QuestionsManager.Instance.ShowQuestion();  // Sorularý baþlat
     }
 
-    public void TapMultiPlayButton()
+    public void TapMultiPlayButton() // calisma mantigi olarak multiplayer butonuna tikladigimda loading panel acilir ve servere baglanmaya calisir photon managerdaki 
+                                     // OnConnectMaster baglaninca otamatik calisir bu calisinca lobiye katiliriz lobby katilinca otamatik OnJoinedLobby calisir ve CreateAndJoinPanel acilir 
     {
         MainPanel.SetActive(false);
-        OpenLoadingPanel();
-        PhotonManager.Instance.ConnectToServer();
+        MultiplayerModeChoisePanel.SetActive(true);
+        //LoadingPanel.SetActive(true);
+        //PhotonManager.Instance.ConnectToServer();
     }
 
     public void OpenQuizPanel()
@@ -61,11 +64,6 @@ public class GameManager : MonoBehaviour
         CreateAndJoinPanel.SetActive(true);
     }
 
-    public void OpenLoadingPanel()
-    {
-        LoadingPanel.SetActive(true);
-    }
-
     public void OpenCreateJoinPanel()
     {
         CreateAndJoinPanel.SetActive(true);
@@ -81,5 +79,19 @@ public class GameManager : MonoBehaviour
     public void OpenTickPlayer2()
     {
         tick[1].gameObject.SetActive(true);
+    }
+
+    // MultiplayerModeChoisePanel
+
+    public void PlayPrivateRoom()
+    {
+        MultiplayerModeChoisePanel.SetActive(false);
+        LoadingPanel.SetActive(true);
+        PhotonManager.Instance.ConnectToServer();
+    }
+
+    public void PlayAnotherPlayer()
+    {
+       
     }
 }

@@ -33,14 +33,6 @@ public class PhotonManager : MonoBehaviourPunCallbacks // bazi callback fonksyio
         PhotonNetwork.JoinLobby();
     }
 
-    //public override void OnJoinedLobby()
-    //{
-    //    if (GameManager.Instance.isConnected)
-    //    {
-    //        Debug.Log("Joined Lobby");
-    //        GameManager.Instance.OpenCreateJoinPanel();
-    //    }
-    //}
     public override void OnJoinedLobby()
     {
         Debug.Log("Joined Lobby");
@@ -71,7 +63,6 @@ public class PhotonManager : MonoBehaviourPunCallbacks // bazi callback fonksyio
     {
         Debug.Log("Joined Room");
         //PhotonNetwork.LoadLevel("GameScene"); // cok oyunculu bir sahne yuklemek istedigimde bunu kullanmam lazim 
-        //GameManager.Instance.OpenQuizPanel();
         GameManager.Instance.OpenWaitingPanel();
     }
 
