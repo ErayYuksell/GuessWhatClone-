@@ -160,7 +160,8 @@ PlayerSettings:
   resetResolutionOnWindowResize: 0
   androidSupportedAspectRatio: 1
   androidMaxAspectRatio: 2.1
-  applicationIdentifier: {}
+  applicationIdentifier:
+    Android: com.DefaultCompany.GuessWhatClone
   buildNumber:
     Standalone: 0
     VisionOS: 0
@@ -883,7 +884,7 @@ PlayerSettings:
   m_RenderingPath: 1
   m_MobileRenderingPath: 1
   metroPackageName: GuessWhatClone
-  metroPackageVersion: 
+  metroPackageVersion: 1.0.0.0
   metroCertificatePath: 
   metroCertificatePassword: 
   metroCertificateSubject: 
@@ -891,7 +892,7 @@ PlayerSettings:
   metroCertificateNotAfter: 0000000000000000
   metroApplicationDescription: GuessWhatClone
   wsaImages: {}
-  metroTileShortName: 
+  metroTileShortName: GuessWhatClone
   metroTileShowName: 0
   metroMediumTileShowName: 0
   metroLargeTileShowName: 0

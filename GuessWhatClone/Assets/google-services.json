@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "173897044382",
+    "project_id": "guesswhatclone",
+    "storage_bucket": "guesswhatclone.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:173897044382:android:95460f8d610ecd4198068f",
+        "android_client_info": {
+          "package_name": "com.DefaultCompany.GuessWhatClone"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCk4bksx6wfg8H64TRKhkrunxlzzm9frEw"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
