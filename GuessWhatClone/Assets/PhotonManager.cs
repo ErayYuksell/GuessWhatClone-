@@ -53,6 +53,9 @@ public class PhotonManager : MonoBehaviourPunCallbacks
     {
         PhotonNetwork.JoinRandomRoom();
     }
+    //burdaki calisma mantigi su sekilde ana menude multiplayer a tikladigimizda loading panel acilir ve servera baglanir baglanma gerceklesince otamatik olarak OnConnectToMaster calisir onun icindeki fonksiyonlada MultiplayerChoisePanel acilir
+    //Burada playerAnotherPlayera tikladik diyelim JoinRandomRoom calisir ve odaya katilinca otamatik olarak OnJoinedRoom calisir ve WaitingPanel acilir odaya biri katilincada otamatik olarak OnPlayerEnteredRoom calisir ve Kisi sayisini kontrol
+    //ettikten sonra QuizPanel acilir
 
     public override void OnJoinRandomFailed(short returnCode, string message)
     {

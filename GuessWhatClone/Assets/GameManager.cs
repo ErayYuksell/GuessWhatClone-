@@ -57,6 +57,7 @@ public class GameManager : MonoBehaviourPunCallbacks
         CreateAndJoinPanel.SetActive(false);
         WaitingPanel.SetActive(false);
         QuestionsManager.Instance.SetMultiplayer(true);  // Çok oyunculu mod için multiplayer'ý true yap
+        QuestionsManager.Instance.ShowQuestion();  // Sorularý baþlat
     }
 
     public void OpenWaitingPanel()

@@ -15,7 +15,7 @@ public class QuestionsManager : MonoBehaviourPunCallbacks
     [SerializeField] TextMeshProUGUI Question;
     [SerializeField] Button[] options;
     [SerializeField] List<Question> questions = new List<Question>();
-    [SerializeField] List<Question> remainingQuestions;
+    List<Question> remainingQuestions;
 
     [Header("Valid question and selected answer")]
     Question currentQuestion;
@@ -31,16 +31,13 @@ public class QuestionsManager : MonoBehaviourPunCallbacks
     [SerializeField] TextMeshProUGUI timerText;
     int score = 0;
     float timeRemaining = 10f;
-    bool isQuestionActive = false; // zamani kontrol etmek icin olan bir bool 
-    bool isMultiplayer = false; // multiplayer ve single arasi gecis icin gereken bool 
+    bool isQuestionActive = false;
+    bool isMultiplayer = false;
 
     private PhotonView photonView;
     private bool[] playersAnswered = new bool[2];
     private int correctAnswerIndex;
     private int[] playerSelections = new int[2];
-
-    int player1_score = 0;
-    int player2_score = 0;
 
     [SerializeField] RectTransform lineTransform;
     [SerializeField] RectTransform player1_Image;
@@ -113,7 +110,7 @@ public class QuestionsManager : MonoBehaviourPunCallbacks
             return;
         }
 
-        if (isMultiplayer) // bazen sorular 2 cihazda farkli oluyordu bunu engellemek icin masterClient soruyu seciyor daha sonra tum cihazlara gosretiyor 
+        if (isMultiplayer)
         {
             if (PhotonNetwork.IsMasterClient)
             {
@@ -178,16 +175,15 @@ public class QuestionsManager : MonoBehaviourPunCallbacks
         playersAnswered[1] = false;
     }
 
-
     public void OnAnswerSelected(int index)
     {
         selectedAnswerIndex = index;
         isQuestionActive = false;
-        SetOptionsInteractable(false);  // Seçenek seçilince butonlarý kapat 
+        SetOptionsInteractable(false);
 
         if (isMultiplayer)
         {
-            ShowSelectedAnswer(PhotonNetwork.LocalPlayer.ActorNumber, index);  // Kendi seçimini göster
+            ShowSelectedAnswer(PhotonNetwork.LocalPlayer.ActorNumber, index);
             photonView.RPC("RPC_PlayerAnswered", RpcTarget.All, PhotonNetwork.LocalPlayer.ActorNumber, index);
         }
         else
@@ -197,7 +193,6 @@ public class QuestionsManager : MonoBehaviourPunCallbacks
             CheckAnswers();
         }
     }
-
 
     [PunRPC]
     void RPC_PlayerAnswered(int playerID, int index)
@@ -212,13 +207,13 @@ public class QuestionsManager : MonoBehaviourPunCallbacks
         }
     }
 
-    void ShowSelectedAnswer(int playerID, int index) // oyuncu kendi cihazinda yaptigi secimi direkt olarak gorecek 
+    void ShowSelectedAnswer(int playerID, int index)
     {
-        string playerIconName = (playerID == 1) ? "Player1Icon" : "Player2Icon"; // player id ye gore image secimi yapiyor daha sonra tiklanan secenekteki image i aciyor 
+        string playerIconName = (playerID == 1) ? "Player1Icon" : "Player2Icon";
         options[index].transform.Find(playerIconName).gameObject.SetActive(true);
     }
 
-    void ShowAllSelectedAnswers()  // oyuncularin birbirinden kopya cekmemesi icin iki oyuncuda secenekleri sectikten sonra secilen secenekler gozukecek 
+    void ShowAllSelectedAnswers()
     {
         for (int i = 0; i < playerSelections.Length; i++)
         {
@@ -231,13 +226,10 @@ public class QuestionsManager : MonoBehaviourPunCallbacks
         }
     }
 
-
     void CheckAnswers()
     {
-        // Correct Answer Color for both players
         options[correctAnswerIndex].GetComponent<Image>().DOColor(correctColor, 0.5f).SetEase(Ease.InOutSine);
 
-        // Tek oyunculu modda skor artýrýmý
         if (!isMultiplayer)
         {
             if (playerSelections[0] == correctAnswerIndex)
@@ -253,7 +245,6 @@ public class QuestionsManager : MonoBehaviourPunCallbacks
         }
         else
         {
-            // Multiplayer modunda oyuncu 1'in cevabý
             if (PhotonNetwork.LocalPlayer.ActorNumber == 1)
             {
                 if (playerSelections[0] == correctAnswerIndex)
@@ -268,7 +259,6 @@ public class QuestionsManager : MonoBehaviourPunCallbacks
                 }
             }
 
-            // Multiplayer modunda oyuncu 2'nin cevabý
             if (PhotonNetwork.LocalPlayer.ActorNumber == 2)
             {
                 if (playerSelections[1] == correctAnswerIndex)
@@ -286,13 +276,14 @@ public class QuestionsManager : MonoBehaviourPunCallbacks
 
         StartCoroutine(WaitAndShowNextQuestion(2));
     }
+
     public void MovePlayersImage(int playerID)
     {
         if (isMultiplayer)
         {
             if (playerID == 1)
             {
-                photonView.RPC("RPC_MoveTheImage", RpcTarget.All, playerID, new Vector2(50, 0)); // RPC fonksiyonu paremetresi olarak direkt olarak rectTransform veremedim hata verdi sanirim direkt olarak image cart curt da veremem 
+                photonView.RPC("RPC_MoveTheImage", RpcTarget.All, playerID, new Vector2(50, 0));
             }
             else if (playerID == 2)
             {
@@ -399,8 +390,4 @@ public class QuestionsManager : MonoBehaviourPunCallbacks
             ShowQuestion();
         }
     }
-
-
-
-
 }
