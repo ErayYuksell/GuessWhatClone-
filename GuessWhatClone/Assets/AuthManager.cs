@@ -111,7 +111,7 @@ public class AuthManager : MonoBehaviour
             warningLoginText.text = "";
             confirmLoginText.text = "Logged In";
             // Move to Main Screen
-            UIManager.instance.MainScreen();
+            GameManager.Instance.MainScreen();
         }
     }
 
@@ -187,7 +187,7 @@ public class AuthManager : MonoBehaviour
                     {
                         //Username is now set
                         //Now return to login screen
-                        UIManager.instance.LoginScreen();
+                        GameManager.Instance.LoginScreen();
                         warningRegisterText.text = "";
                     }
                 }

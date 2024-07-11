@@ -14,6 +14,8 @@ public class GameManager : MonoBehaviourPunCallbacks
     [SerializeField] GameObject LoadingPanel;
     [SerializeField] GameObject WaitingPanel;
     [SerializeField] GameObject MultiplayerModeChoisePanel;
+    [SerializeField] GameObject loginUI;
+    [SerializeField] GameObject registerUI;
     [SerializeField] TextMeshProUGUI CountdownText;
     [SerializeField] Image[] tick = new Image[2];
 
@@ -124,5 +126,32 @@ public class GameManager : MonoBehaviourPunCallbacks
             countdown--;
         }
         OpenQuizPanel();
+    }
+    // register and log in panel
+    public void LoginScreen() // Back button
+    {
+        loginUI.SetActive(true);
+        registerUI.SetActive(false);
+        MainPanel.SetActive(false);
+    }
+
+    public void RegisterScreen() // Register button
+    {
+        loginUI.SetActive(false);
+        registerUI.SetActive(true);
+        MainPanel.SetActive(false);
+    }
+
+    public void MainScreen() // After login
+    {
+        loginUI.SetActive(false);
+        registerUI.SetActive(false);
+        MainPanel.SetActive(true);
+    }
+
+    public void PassButton()
+    {
+        registerUI.SetActive(false);
+        loginUI.SetActive(true);
     }
 }
