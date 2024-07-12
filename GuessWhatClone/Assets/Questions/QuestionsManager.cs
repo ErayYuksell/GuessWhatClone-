@@ -30,6 +30,8 @@ public class QuestionsManager : MonoBehaviourPunCallbacks
     [SerializeField] TextMeshProUGUI scoreText;
     [SerializeField] TextMeshProUGUI timerText;
     int score = 0;
+    int score1 = 0;
+    int score2 = 0;
     float timeRemaining = 10f;
     bool isQuestionActive = false;
     bool isMultiplayer = false;
@@ -42,6 +44,9 @@ public class QuestionsManager : MonoBehaviourPunCallbacks
     [SerializeField] RectTransform lineTransform;
     [SerializeField] RectTransform player1_Image;
     [SerializeField] RectTransform player2_Image;
+
+    [SerializeField] TextMeshProUGUI winningPlayerText;
+    [SerializeField] TextMeshProUGUI winningScoreText;
 
     void Awake()
     {
@@ -106,7 +111,7 @@ public class QuestionsManager : MonoBehaviourPunCallbacks
     {
         if (remainingQuestions == null || remainingQuestions.Count == 0)
         {
-            Debug.LogError("No remaining questions.");
+            //ShowWinningPanel();
             return;
         }
 
@@ -234,7 +239,7 @@ public class QuestionsManager : MonoBehaviourPunCallbacks
         {
             if (playerSelections[0] == correctAnswerIndex)
             {
-                score += 10;
+                score1 += 10;
                 UpdateScoreText();
                 MovePlayersImage(1);
             }
@@ -250,6 +255,8 @@ public class QuestionsManager : MonoBehaviourPunCallbacks
                 if (playerSelections[0] == correctAnswerIndex)
                 {
                     score += 10;
+                    score1 += 10;
+                    photonView.RPC("RPC_UpdateScore", RpcTarget.All, score1, score2);
                     UpdateScoreText();
                     MovePlayersImage(1);
                 }
@@ -264,6 +271,8 @@ public class QuestionsManager : MonoBehaviourPunCallbacks
                 if (playerSelections[1] == correctAnswerIndex)
                 {
                     score += 10;
+                    score2 += 10;
+                    photonView.RPC("RPC_UpdateScore", RpcTarget.All, score1, score2);
                     UpdateScoreText();
                     MovePlayersImage(2);
                 }
@@ -276,6 +285,7 @@ public class QuestionsManager : MonoBehaviourPunCallbacks
 
         StartCoroutine(WaitAndShowNextQuestion(2));
     }
+
 
     public void MovePlayersImage(int playerID)
     {
@@ -334,13 +344,28 @@ public class QuestionsManager : MonoBehaviourPunCallbacks
     {
         if (scoreText != null)
         {
-            scoreText.text = "Score: " + score.ToString();
+            if (isMultiplayer)
+            {
+                scoreText.text = "Score:  " + score.ToString(); // score degiskeni multiplayer da neden var cunku farkli cihazlarda sadece sokru kendilerine gosteriyorum diger cihazlara gostermedigim icin player 1 sa score1 dememe gerek yok 
+            }
+            else
+            {
+                scoreText.text = "Score: " + score1.ToString();
+            }
         }
         else
         {
             Debug.LogError("Score TextMeshProUGUI is not assigned.");
         }
     }
+
+    [PunRPC]
+    void RPC_UpdateScore(int updatedScore1, int updatedScore2)
+    {
+        score1 = updatedScore1;
+        score2 = updatedScore2;
+    }
+
 
     private void ResetOptionColors()
     {
@@ -371,6 +396,10 @@ public class QuestionsManager : MonoBehaviourPunCallbacks
         {
             ShowQuestion();
         }
+        else
+        {
+            photonView.RPC("RPC_ShowWinningPanel", RpcTarget.All);
+        }
     }
 
     public void SetMultiplayer(bool isMultiplayer)
@@ -389,5 +418,35 @@ public class QuestionsManager : MonoBehaviourPunCallbacks
         {
             ShowQuestion();
         }
+    }
+
+    [PunRPC]
+    public void RPC_ShowWinningPanel() // Winning Panel
+    {
+        GameManager.Instance.OpenWinningPanel();
+        if (isMultiplayer)
+        {
+            if (score1 > score2)
+            {
+                winningPlayerText.text = "Player 1";
+                winningScoreText.text = score1.ToString();
+            }
+            else if (score2 > score1)
+            {
+                winningPlayerText.text = "Player 2";
+                winningScoreText.text = score2.ToString();
+            }
+            else
+            {
+                winningPlayerText.text = "Draw";
+                winningScoreText.text = score1.ToString() + " - " + score2.ToString();
+            }
+        }
+        else
+        {
+            winningPlayerText.text = "Username: "; // ekleme yapilacak
+            winningScoreText.text = score1.ToString();
+        }
+
     }
 }

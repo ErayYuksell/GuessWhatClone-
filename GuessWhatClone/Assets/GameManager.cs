@@ -16,6 +16,7 @@ public class GameManager : MonoBehaviourPunCallbacks
     [SerializeField] GameObject MultiplayerModeChoisePanel;
     [SerializeField] GameObject loginUI;
     [SerializeField] GameObject registerUI;
+    [SerializeField] GameObject WinningPanel;
     [SerializeField] TextMeshProUGUI CountdownText;
     [SerializeField] Image[] tick = new Image[2];
 
@@ -153,5 +154,11 @@ public class GameManager : MonoBehaviourPunCallbacks
     {
         registerUI.SetActive(false);
         loginUI.SetActive(true);
+    }
+
+    public void OpenWinningPanel()
+    {
+        QuizPanel.SetActive(false);
+        WinningPanel.SetActive(true);
     }
 }

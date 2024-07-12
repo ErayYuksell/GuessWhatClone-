@@ -49,6 +49,8 @@ MonoBehaviour:
   - RPC_MoveTheImage
   - RPC_StartCountdown
   - StartCountdown
+  - RPC_ShowWinningPanel
+  - RPC_UpdateScore
   DisableAutoOpenWizard: 1
   ShowSettings: 0
   DevRegionSetOnce: 1
