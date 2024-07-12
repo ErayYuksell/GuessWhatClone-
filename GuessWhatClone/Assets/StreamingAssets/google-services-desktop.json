@@ -1,6 +1,7 @@
 {
   "project_info": {
     "project_number": "173897044382",
+    "firebase_url": "https://guesswhatclone-default-rtdb.firebaseio.com",
     "project_id": "guesswhatclone",
     "storage_bucket": "guesswhatclone.appspot.com"
   },

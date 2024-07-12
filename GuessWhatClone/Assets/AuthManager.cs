@@ -52,8 +52,17 @@ public class AuthManager : MonoBehaviour
         Debug.Log("Setting up Firebase Auth");
         app = FirebaseApp.DefaultInstance;
         auth = FirebaseAuth.DefaultInstance;
+        if (app == null) // bu kontrollerin hepsi bu hatalari aldigimdan dolayi var her turlu ise yariyor kontroller 
+        {
+            Debug.LogError("FirebaseApp is null.");
+        }
+        else
+        {
+            Debug.Log("FirebaseApp is initialized successfully.");
+        }
         DatabaseManager.Instance.InitializeFirebase(app); // DatabaseManager'a baþlatýlmýþ Firebase örneðini iletin
     }
+
 
     //Function for the login button
     public void LoginButton()

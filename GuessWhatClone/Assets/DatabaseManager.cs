@@ -28,6 +28,14 @@ public class DatabaseManager : MonoBehaviour
     public void InitializeFirebase(FirebaseApp app)
     {
         dbReference = FirebaseDatabase.GetInstance(app).RootReference;
+        if (dbReference == null) // bu kontrollerin hepsi bu hatalari aldigimdan dolayi var her turlu ise yariyor kontroller 
+        {
+            Debug.LogError("Failed to get the database reference. dbReference is null.");
+        }
+        else
+        {
+            Debug.Log("Firebase database reference is initialized successfully.");
+        }
         IsFirebaseInitialized = true;
         Debug.Log("Firebase initialized successfully in DatabaseManager.");
     }
@@ -40,7 +48,7 @@ public class DatabaseManager : MonoBehaviour
             return;
         }
 
-        User newUser = new User(username, 0);
+        User newUser = new User(username, 0); // 0 baþlangýç skoruyla yeni kullanýcý oluþturuluyor
         string json = JsonUtility.ToJson(newUser);
 
         dbReference.Child("users").Child(userId).SetRawJsonValueAsync(json).ContinueWith(task =>
@@ -55,6 +63,7 @@ public class DatabaseManager : MonoBehaviour
             }
         });
     }
+
 
     public IEnumerator GetUsername(string userId, Action<string> onCallback)
     {
