@@ -12,6 +12,7 @@ public class AuthManager : MonoBehaviour
     public DependencyStatus dependencyStatus;
     public FirebaseAuth auth;
     public FirebaseUser User;
+    public FirebaseApp app;
 
     //Login variables
     [Header("Login")]
@@ -49,8 +50,9 @@ public class AuthManager : MonoBehaviour
     private void InitializeFirebase()
     {
         Debug.Log("Setting up Firebase Auth");
-        //Kimlik doðrulama örneði nesnesini ayarlama
+        app = FirebaseApp.DefaultInstance;
         auth = FirebaseAuth.DefaultInstance;
+        DatabaseManager.Instance.InitializeFirebase(app); // DatabaseManager'a baþlatýlmýþ Firebase örneðini iletin
     }
 
     //Function for the login button
@@ -185,6 +187,8 @@ public class AuthManager : MonoBehaviour
                     }
                     else
                     {
+                        // Kullanýcý adý ve skoru veritabanýna kaydet
+                        DatabaseManager.Instance.CreateUser(User.UserId, _username);
                         //Username is now set
                         //Now return to login screen
                         GameManager.Instance.LoginScreen();
