@@ -55,12 +55,19 @@ public class QuestionsManager : MonoBehaviourPunCallbacks
             Instance = this;
             DontDestroyOnLoad(gameObject);
             photonView = GetComponent<PhotonView>();
+            if (photonView == null) 
+            {
+                Debug.LogError("PhotonView NULL");
+                photonView = gameObject.AddComponent<PhotonView>();
+                photonView.ViewID = 2; // Doðru viewID'yi ayarlayýn
+            }
         }
         else
         {
             Destroy(gameObject);
         }
     }
+
 
     void Start()
     {
@@ -416,6 +423,11 @@ public class QuestionsManager : MonoBehaviourPunCallbacks
     {
         if (PhotonNetwork.IsMasterClient)
         {
+            if (photonView == null)
+            {
+                photonView = gameObject.AddComponent<PhotonView>();
+                photonView.ViewID = 2; // Doðru viewID'yi ayarlayýn
+            }
             ShowQuestion();
         }
     }

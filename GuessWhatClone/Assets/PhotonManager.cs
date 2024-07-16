@@ -9,12 +9,19 @@ public class PhotonManager : MonoBehaviourPunCallbacks
     public TMP_InputField createInput;
     public TMP_InputField joinInput;
 
+    PhotonView photonView;
     void Awake()
     {
         if (Instance == null)
         {
             Instance = this;
             DontDestroyOnLoad(gameObject);
+            photonView = GetComponent<PhotonView>();
+            if (photonView == null)
+            {
+                photonView = gameObject.AddComponent<PhotonView>();
+                photonView.ViewID = 1; // Doðru viewID'yi ayarlayýn
+            }
         }
         else
         {
